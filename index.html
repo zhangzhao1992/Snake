@@ -7,7 +7,7 @@
     <meta name="description" content="经典贪吃蛇网页版，支持手机、平板和电脑。">
     <title>经典贪吃蛇</title>
     <link rel="manifest" href="manifest.webmanifest">
-    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="styles.css?v=3">
   </head>
   <body>
     <main class="game-shell" aria-label="经典贪吃蛇游戏">
@@ -61,13 +61,14 @@
         <section class="leaderboard" aria-label="排行榜">
           <div class="leaderboard-head">
             <h2>排行榜</h2>
-            <button id="clearScoresBtn" type="button">清空</button>
+            <span id="leaderboardStatus">本机</span>
+            <button id="clearScoresBtn" type="button">刷新</button>
           </div>
           <ol id="leaderboardList"></ol>
         </section>
       </section>
     </main>
 
-    <script src="game.js?v=2" defer></script>
+    <script src="game.js?v=3" defer></script>
   </body>
 </html>

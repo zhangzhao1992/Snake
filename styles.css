@@ -309,6 +309,13 @@ canvas {
   line-height: 1;
 }
 
+.leaderboard-head span {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
 .leaderboard-head button {
   min-height: 32px;
   padding: 0 10px;

@@ -5,6 +5,7 @@ const bestEl = document.querySelector("#best");
 const speedEl = document.querySelector("#speed");
 const playerNameInput = document.querySelector("#playerName");
 const leaderboardList = document.querySelector("#leaderboardList");
+const leaderboardStatus = document.querySelector("#leaderboardStatus");
 const clearScoresBtn = document.querySelector("#clearScoresBtn");
 const overlay = document.querySelector("#overlay");
 const overlayTitle = document.querySelector("#overlayTitle");
@@ -19,6 +20,7 @@ const startSnake = [
   { x: 7, y: 12 },
   { x: 6, y: 12 },
 ];
+const apiBase = window.SNAKE_API_BASE || "";
 
 let snake;
 let food;
@@ -33,12 +35,14 @@ let animationId;
 let state;
 let touchStart = null;
 let leaderboard = loadLeaderboard();
+let onlineLeaderboard = false;
 
 const savedPlayerName = localStorage.getItem("snake-player-name");
 if (savedPlayerName) playerNameInput.value = savedPlayerName;
 best = getBestScore();
 bestEl.textContent = best;
 renderLeaderboard();
+fetchLeaderboard();
 
 function resetGame() {
   snake = startSnake.map((part) => ({ ...part }));
@@ -254,7 +258,7 @@ function getPlayerName() {
 function loadLeaderboard() {
   try {
     const records = JSON.parse(localStorage.getItem("snake-leaderboard") || "[]");
-    return Array.isArray(records) ? records.filter((item) => item?.name && Number.isFinite(item?.score)) : [];
+    return normalizeRecords(records);
   } catch {
     return [];
   }
@@ -264,31 +268,80 @@ function saveLeaderboard() {
   localStorage.setItem("snake-leaderboard", JSON.stringify(leaderboard));
 }
 
+function normalizeRecords(records) {
+  if (!Array.isArray(records)) return [];
+  return records
+    .filter((item) => item?.name && Number.isFinite(Number(item?.score)))
+    .map((item) => ({
+      name: String(item.name).trim().slice(0, 16) || "玩家1",
+      score: Math.max(0, Math.floor(Number(item.score))),
+      date: item.date || new Date().toISOString(),
+    }))
+    .sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date))
+    .slice(0, 50);
+}
+
 function getBestScore() {
   const legacyBest = Number(localStorage.getItem("snake-best") || 0);
   const boardBest = leaderboard.reduce((max, item) => Math.max(max, item.score), 0);
   return Math.max(legacyBest, boardBest);
 }
 
-function saveScore() {
+async function fetchLeaderboard() {
+  try {
+    const response = await fetch(`${apiBase}/api/scores`, { cache: "no-store" });
+    if (!response.ok) throw new Error("排行榜读取失败");
+    const data = await response.json();
+    leaderboard = normalizeRecords(data.scores);
+    onlineLeaderboard = true;
+    saveLeaderboard();
+    best = getBestScore();
+    updateStats();
+    renderLeaderboard();
+  } catch {
+    onlineLeaderboard = false;
+    renderLeaderboard();
+  }
+}
+
+async function saveScore() {
   const name = getPlayerName();
   localStorage.setItem("snake-player-name", name);
 
-  leaderboard.push({
+  const record = {
     name,
     score,
     date: new Date().toISOString(),
-  });
+  };
 
-  leaderboard.sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date));
-  leaderboard = leaderboard.slice(0, 50);
+  leaderboard = normalizeRecords([...leaderboard, record]);
   saveLeaderboard();
   renderLeaderboard();
+
+  try {
+    const response = await fetch(`${apiBase}/api/scores`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(record),
+    });
+    if (!response.ok) throw new Error("分数提交失败");
+    const data = await response.json();
+    leaderboard = normalizeRecords(data.scores);
+    onlineLeaderboard = true;
+    saveLeaderboard();
+    best = getBestScore();
+    updateStats();
+    renderLeaderboard();
+  } catch {
+    onlineLeaderboard = false;
+    renderLeaderboard();
+  }
 }
 
 function renderLeaderboard() {
   const topScores = leaderboard.slice(0, 10);
   leaderboardList.replaceChildren();
+  leaderboardStatus.textContent = onlineLeaderboard ? "在线" : "本机";
 
   if (topScores.length === 0) {
     const empty = document.createElement("li");
@@ -400,14 +453,7 @@ playerNameInput.addEventListener("change", () => {
 playerNameInput.addEventListener("keydown", (event) => {
   event.stopPropagation();
 });
-clearScoresBtn.addEventListener("click", () => {
-  leaderboard = [];
-  localStorage.removeItem("snake-leaderboard");
-  localStorage.removeItem("snake-best");
-  best = 0;
-  updateStats();
-  renderLeaderboard();
-});
+clearScoresBtn.addEventListener("click", fetchLeaderboard);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {

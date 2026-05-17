@@ -1,9 +1,9 @@
-const CACHE_NAME = "classic-snake-v2";
+const CACHE_NAME = "classic-snake-v3";
 const ASSETS = [
   ".",
   "index.html",
-  "styles.css?v=2",
-  "game.js?v=2",
+  "styles.css?v=3",
+  "game.js?v=3",
   "manifest.webmanifest",
   "icon.svg",
 ];
