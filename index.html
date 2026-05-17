@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#17281f">
+    <meta name="description" content="经典贪吃蛇网页版，支持手机、平板和电脑。">
+    <title>经典贪吃蛇</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="game-shell" aria-label="经典贪吃蛇游戏">
+      <section class="scorebar" aria-label="游戏状态">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <h1>贪吃蛇</h1>
+        </div>
+        <div class="stats">
+          <div>
+            <span>分数</span>
+            <strong id="score">0</strong>
+          </div>
+          <div>
+            <span>最佳</span>
+            <strong id="best">0</strong>
+          </div>
+          <div>
+            <span>速度</span>
+            <strong id="speed">1x</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="play-area" aria-label="游戏棋盘">
+        <canvas id="board" width="600" height="600" aria-label="贪吃蛇棋盘"></canvas>
+        <div class="overlay" id="overlay">
+          <div class="overlay-panel">
+            <h2 id="overlayTitle">准备开始</h2>
+            <p id="overlayText">按空格、回车或点击开始。手机可滑动或使用方向键。</p>
+            <button class="primary-action" id="startBtn" type="button">开始游戏</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="游戏控制">
+        <div class="actions">
+          <button id="pauseBtn" type="button" aria-label="暂停或继续">暂停</button>
+          <button id="restartBtn" type="button" aria-label="重新开始">重开</button>
+        </div>
+        <div class="dpad" aria-label="触控方向键">
+          <button data-dir="up" class="up" type="button" aria-label="向上">▲</button>
+          <button data-dir="left" class="left" type="button" aria-label="向左">◀</button>
+          <button data-dir="right" class="right" type="button" aria-label="向右">▶</button>
+          <button data-dir="down" class="down" type="button" aria-label="向下">▼</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="game.js" defer></script>
+  </body>
+</html>

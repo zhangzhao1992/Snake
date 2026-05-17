@@ -1,0 +1,17 @@
+{
+  "name": "经典贪吃蛇",
+  "short_name": "贪吃蛇",
+  "description": "支持手机、平板和电脑的经典贪吃蛇游戏。",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0f1713",
+  "theme_color": "#17281f",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
