@@ -7,7 +7,7 @@
     <meta name="description" content="经典贪吃蛇网页版，支持手机、平板和电脑。">
     <title>经典贪吃蛇</title>
     <link rel="manifest" href="manifest.webmanifest">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2">
   </head>
   <body>
     <main class="game-shell" aria-label="经典贪吃蛇游戏">
@@ -16,6 +16,10 @@
           <span class="brand-mark" aria-hidden="true"></span>
           <h1>贪吃蛇</h1>
         </div>
+        <label class="player-name">
+          <span>玩家</span>
+          <input id="playerName" type="text" maxlength="16" autocomplete="nickname" value="玩家1" aria-label="玩家名称">
+        </label>
         <div class="stats">
           <div>
             <span>分数</span>
@@ -54,9 +58,16 @@
           <button data-dir="right" class="right" type="button" aria-label="向右">▶</button>
           <button data-dir="down" class="down" type="button" aria-label="向下">▼</button>
         </div>
+        <section class="leaderboard" aria-label="排行榜">
+          <div class="leaderboard-head">
+            <h2>排行榜</h2>
+            <button id="clearScoresBtn" type="button">清空</button>
+          </div>
+          <ol id="leaderboardList"></ol>
+        </section>
       </section>
     </main>
 
-    <script src="game.js" defer></script>
+    <script src="game.js?v=2" defer></script>
   </body>
 </html>

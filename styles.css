@@ -82,6 +82,37 @@ button:active {
   backdrop-filter: blur(16px);
 }
 
+.player-name {
+  display: grid;
+  gap: 5px;
+  min-width: 150px;
+  margin-left: auto;
+}
+
+.player-name span {
+  color: var(--muted);
+  font-size: 0.76rem;
+  line-height: 1;
+}
+
+.player-name input {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.055);
+  font: inherit;
+  font-weight: 750;
+  outline: none;
+}
+
+.player-name input:focus {
+  border-color: rgba(102, 209, 122, 0.58);
+  box-shadow: 0 0 0 4px rgba(102, 209, 122, 0.14);
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -257,6 +288,79 @@ canvas {
   grid-row: 3;
 }
 
+.leaderboard {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(23, 40, 31, 0.78);
+  border: 1px solid var(--line);
+}
+
+.leaderboard-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.leaderboard h2 {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.leaderboard-head button {
+  min-height: 32px;
+  padding: 0 10px;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.leaderboard ol {
+  display: grid;
+  gap: 6px;
+  min-height: 34px;
+  max-height: 220px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: auto;
+}
+
+.leaderboard li {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(242, 246, 236, 0.1);
+}
+
+.leaderboard .rank {
+  color: var(--gold);
+  font-weight: 850;
+}
+
+.leaderboard .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 750;
+}
+
+.leaderboard .points {
+  color: var(--text);
+  font-weight: 850;
+}
+
+.leaderboard .empty {
+  grid-template-columns: 1fr;
+  color: var(--muted);
+  text-align: center;
+}
+
 @media (max-width: 760px) {
   body {
     align-items: start;
@@ -277,6 +381,10 @@ canvas {
     gap: 10px;
   }
 
+  .player-name {
+    margin-left: 0;
+  }
+
   .stats {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -287,6 +395,10 @@ canvas {
 
   .controls {
     align-content: start;
+  }
+
+  .leaderboard ol {
+    max-height: 170px;
   }
 
   .dpad {

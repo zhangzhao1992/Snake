@@ -3,6 +3,9 @@ const ctx = board.getContext("2d");
 const scoreEl = document.querySelector("#score");
 const bestEl = document.querySelector("#best");
 const speedEl = document.querySelector("#speed");
+const playerNameInput = document.querySelector("#playerName");
+const leaderboardList = document.querySelector("#leaderboardList");
+const clearScoresBtn = document.querySelector("#clearScoresBtn");
 const overlay = document.querySelector("#overlay");
 const overlayTitle = document.querySelector("#overlayTitle");
 const overlayText = document.querySelector("#overlayText");
@@ -29,8 +32,13 @@ let lastMoveAt;
 let animationId;
 let state;
 let touchStart = null;
+let leaderboard = loadLeaderboard();
 
+const savedPlayerName = localStorage.getItem("snake-player-name");
+if (savedPlayerName) playerNameInput.value = savedPlayerName;
+best = getBestScore();
 bestEl.textContent = best;
+renderLeaderboard();
 
 function resetGame() {
   snake = startSnake.map((part) => ({ ...part }));
@@ -73,10 +81,8 @@ function pauseGame() {
 
 function endGame() {
   state = "gameover";
-  if (score > best) {
-    best = score;
-    localStorage.setItem("snake-best", String(best));
-  }
+  saveScore();
+  best = getBestScore();
   updateStats();
   showOverlay("游戏结束", `本局得分 ${score}。`, "再玩一局");
 }
@@ -240,6 +246,78 @@ function updateStats() {
   speedEl.textContent = `${level}x`;
 }
 
+function getPlayerName() {
+  const name = playerNameInput.value.trim().replace(/\s+/g, " ");
+  return name || "玩家1";
+}
+
+function loadLeaderboard() {
+  try {
+    const records = JSON.parse(localStorage.getItem("snake-leaderboard") || "[]");
+    return Array.isArray(records) ? records.filter((item) => item?.name && Number.isFinite(item?.score)) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveLeaderboard() {
+  localStorage.setItem("snake-leaderboard", JSON.stringify(leaderboard));
+}
+
+function getBestScore() {
+  const legacyBest = Number(localStorage.getItem("snake-best") || 0);
+  const boardBest = leaderboard.reduce((max, item) => Math.max(max, item.score), 0);
+  return Math.max(legacyBest, boardBest);
+}
+
+function saveScore() {
+  const name = getPlayerName();
+  localStorage.setItem("snake-player-name", name);
+
+  leaderboard.push({
+    name,
+    score,
+    date: new Date().toISOString(),
+  });
+
+  leaderboard.sort((a, b) => b.score - a.score || new Date(a.date) - new Date(b.date));
+  leaderboard = leaderboard.slice(0, 50);
+  saveLeaderboard();
+  renderLeaderboard();
+}
+
+function renderLeaderboard() {
+  const topScores = leaderboard.slice(0, 10);
+  leaderboardList.replaceChildren();
+
+  if (topScores.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "empty";
+    empty.textContent = "还没有分数";
+    leaderboardList.append(empty);
+    return;
+  }
+
+  topScores.forEach((record, index) => {
+    const item = document.createElement("li");
+
+    const rank = document.createElement("span");
+    rank.className = "rank";
+    rank.textContent = `#${index + 1}`;
+
+    const name = document.createElement("span");
+    name.className = "name";
+    name.textContent = record.name;
+
+    const points = document.createElement("span");
+    points.className = "points";
+    points.textContent = record.score;
+
+    item.append(rank, name, points);
+    leaderboardList.append(item);
+  });
+}
+
 function showOverlay(title, text, buttonText) {
   overlayTitle.textContent = title;
   overlayText.textContent = text;
@@ -314,6 +392,21 @@ board.addEventListener("touchstart", handleTouchStart, { passive: true });
 board.addEventListener("touchend", handleTouchEnd, { passive: true });
 document.querySelectorAll("[data-dir]").forEach((button) => {
   button.addEventListener("click", () => setDirection(button.dataset.dir));
+});
+playerNameInput.addEventListener("change", () => {
+  playerNameInput.value = getPlayerName();
+  localStorage.setItem("snake-player-name", playerNameInput.value);
+});
+playerNameInput.addEventListener("keydown", (event) => {
+  event.stopPropagation();
+});
+clearScoresBtn.addEventListener("click", () => {
+  leaderboard = [];
+  localStorage.removeItem("snake-leaderboard");
+  localStorage.removeItem("snake-best");
+  best = 0;
+  updateStats();
+  renderLeaderboard();
 });
 
 if ("serviceWorker" in navigator) {
